@@ -1,0 +1,53 @@
+version: "3.8"
+
+services:
+  cdservice:
+    build:
+      context: .
+      dockerfile: CdService/Dockerfile
+    ports:
+      - "7262:8080"
+    environment:
+      - ConnectionStrings__CdDBConnection=Server=sqlserver;Database=CdDB;User=sa;Password=YourStrong!Password;TrustServerCertificate=True;
+    depends_on:
+      - sqlserver
+
+  shoppingservice:
+    build:
+      context: .
+      dockerfile: ShoppingService/Dockerfile
+    ports:
+      - "7273:8080"
+    environment:
+      - ConnectionStrings__ShoppingDBConnection=Server=sqlserver;Database=ShoppingDB;User=sa;Password=YourStrong!Password;TrustServerCertificate=True;
+      - CdServiceBaseUrl=http://cdservice:8080
+      - UserServiceBaseUrl=http://userservice:8080
+    depends_on:
+      - cdservice
+      - userservice
+      - sqlserver
+
+  userservice:
+    build:
+      context: .
+      dockerfile: UserService/Dockerfile
+    ports:
+      - "7170:8080"
+    environment:
+      - ConnectionStrings__UserDBConnection=Server=sqlserver;Database=UserDB;User=sa;Password=YourStrong!Password;TrustServerCertificate=True;
+      - ShoppingServiceBaseUrl=http://shoppingservice:8080
+    depends_on:
+      - sqlserver
+
+  sqlserver:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      SA_PASSWORD: "YourStrong!Password"
+      ACCEPT_EULA: "Y"
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+volumes:
+  sql_data:

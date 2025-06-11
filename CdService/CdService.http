@@ -1,0 +1,6 @@
+@CdService_HostAddress = http://localhost:5046
+
+GET {{CdService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
