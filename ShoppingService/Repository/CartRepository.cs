@@ -71,7 +71,7 @@ public class CartRepository : ICartRepository
     {
         if (string.IsNullOrEmpty(email))
         {
-            throw new ArgumentException("Email no puede ser nulo o vacío");
+            throw new ArgumentException("Email cannot be null or empty");
         }
 
         var cart = await _context.Carts
